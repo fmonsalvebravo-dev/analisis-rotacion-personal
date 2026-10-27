@@ -10,6 +10,15 @@
 - **La alta renuncia del primer año se explica por quiénes son los nuevos.** Los empleados con 0 a 1 año renuncian a 34,9%, pero el modelo muestra que esto se debe principalmente a que son más jóvenes y ganan menos, no a la antigüedad en sí.
 - **Los factores se suman.** Más de la mitad de los empleados con sueldo bajo y horas extra renuncia (56,1%).
 - **Es posible anticipar renuncias.** Un modelo de regresión logística detecta 2 de cada 3 renuncias en datos no vistos, con el doble de certeza que el azar, y asigna un puntaje de riesgo a cada empleado activo.
+- **193 empleados activos están en riesgo alto.** Un dashboard en Power BI permite filtrarlos por área, cargo y nivel de riesgo para priorizar acciones de retención.
+
+## Dashboard
+
+![Resumen](powerbi/capturas/resumen.png)
+
+| Factores | Empleados en riesgo |
+|---|---|
+| ![Factores](powerbi/capturas/factores.png) | ![Empleados en riesgo](powerbi/capturas/empleados_en_riesgo.png) |
 
 ## Estructura del repositorio
 
@@ -18,8 +27,11 @@ analisis-rotacion-personal/
 ├── README.md
 ├── sql/
 │   └── consultas_rotacion.sql      Análisis por grupos y cruces
-└── python/
-    └── analisis_rotacion.ipynb     Correlaciones, modelo y puntaje de riesgo
+├── python/
+│   └── analisis_rotacion.ipynb     Correlaciones, modelo y puntaje de riesgo
+└── powerbi/
+    ├── analisis_rotacion.pbix      Dashboard interactivo
+    └── capturas/                   Imágenes de cada página
 ```
 
 ## Datos
@@ -33,6 +45,7 @@ analisis-rotacion-personal/
 
 - **MySQL 8** y MySQL Workbench
 - **Python 3.11:** pandas, SQLAlchemy, scikit-learn (Jupyter Notebook en VS Code)
+- **Power BI Desktop:** DAX, Power Query
 
 ## Metodología
 
@@ -52,6 +65,12 @@ analisis-rotacion-personal/
 4. **Regresión logística** con variables estandarizadas, para medir el efecto propio de cada factor.
 5. **Evaluación** con datos de prueba (25%) y ajuste por desbalance de clases.
 6. Cálculo de un **puntaje de riesgo** por empleado, guardado en MySQL para Power BI.
+
+**Etapa 3: Power BI**
+
+1. Conexión a MySQL y carga de las tablas `employees` y `riesgo_renuncia`, relacionadas por `EmployeeNumber`.
+2. Medidas en **DAX** (total de empleados, renuncias, tasa de renuncia y activos en riesgo alto) y columnas calculadas para los tramos de sueldo, edad y antigüedad.
+3. Dashboard de tres páginas con títulos que resumen la conclusión de cada gráfico y un color de alerta reservado para los grupos de mayor riesgo.
 
 ## Análisis en SQL
 
@@ -214,6 +233,24 @@ Con el modelo final se calculó un **puntaje de riesgo** para cada empleado, gua
 
 Los 193 empleados activos en riesgo alto son la lista prioritaria para acciones de retención. El puntaje sirve para ordenar y priorizar, no como probabilidad literal de renuncia, ya que el ajuste por desbalance infla sus valores.
 
+## Dashboard en Power BI
+
+El archivo está en [`powerbi/analisis_rotacion.pbix`](powerbi/analisis_rotacion.pbix). Tiene tres páginas:
+
+| Página | Contenido | Para qué sirve |
+|---|---|---|
+| **Resumen** | Indicadores generales (1.470 empleados, 237 renuncias, tasa de 16,1%, 193 activos en riesgo alto), tasa de renuncia según horas extra y empleados activos por nivel de riesgo | Entender la situación general en un vistazo |
+| **Factores** | Tasa de renuncia por cargo, tramo de sueldo, edad y antigüedad | Ver qué grupos concentran el riesgo |
+| **Empleados en riesgo** | Tabla de empleados activos ordenada por puntaje de riesgo, con filtros por área, cargo y nivel de riesgo | Priorizar a quién contactar primero |
+
+**Decisiones de diseño:**
+
+- Cada gráfico tiene un **título con la conclusión** (por ejemplo, "Quienes hacen horas extra renuncian 3 veces más"), para que el mensaje se entienda sin leer los números.
+- El **naranjo** se usa solo para los grupos de mayor riesgo (horas extra, riesgo alto, el tramo más crítico de cada factor); el resto va en colores neutros.
+- La tabla de riesgo muestra solo a los **empleados activos**, porque son a quienes la empresa todavía puede retener.
+
+*Nota:* el archivo se conecta a una base MySQL local, por lo que actualizar los datos requiere recrear la base con el script SQL y el notebook. El archivo incluye una copia de los datos, así que se puede abrir y explorar sin conexión.
+
 ## Recomendaciones
 
 1. **Reducir las horas extra**, especialmente en cargos de entrada y en empleados nuevos. Es la medida con mayor impacto potencial.
@@ -231,9 +268,10 @@ Los 193 empleados activos en riesgo alto son la lista prioritaria para acciones 
 - La regresión logística supone efectos lineales: si el riesgo de la antigüedad se concentra solo en el primer año, el modelo podría subestimarlo.
 - El modelo solo puede usar la información disponible en el dataset. Factores como la relación con el jefe o las ofertas de otras empresas no están incluidos.
 
-## Próximos pasos
+## Posibles mejoras
 
-- **Power BI:** dashboard con los hallazgos principales, los perfiles de riesgo y la lista de empleados activos priorizada por puntaje.
+- Probar modelos más flexibles (por ejemplo, árboles de decisión) que capten efectos no lineales, como el riesgo concentrado en el primer año.
+- Con datos reales, incorporar variables como la cantidad de horas extra, la evaluación del jefe o la fecha de renuncia, para analizar tendencias en el tiempo.
 
 ## Autor
 
