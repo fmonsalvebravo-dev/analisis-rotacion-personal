@@ -14,11 +14,11 @@
 
 ## Dashboard
 
-![Resumen](powerbi/capturas/resumen.png)
+![Resumen](powerbi/capturas/resumen.PNG)
 
 | Factores | Empleados en riesgo |
 |---|---|
-| ![Factores](powerbi/capturas/factores.png) | ![Empleados en riesgo](powerbi/capturas/empleados_en_riesgo.png) |
+| ![Factores](powerbi/capturas/factores.PNG) | ![Empleados en riesgo](powerbi/capturas/empleados_en_riesgo.PNG) |
 
 ## Estructura del repositorio
 
